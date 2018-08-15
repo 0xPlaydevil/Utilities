@@ -99,7 +99,7 @@ public class Original : MonoBehaviour {
 		{
 			return m_childInfos[trans.GetInstanceID()];
 		}
-		catch(Exception e)
+		catch
 		{
 			return null;
 		}
