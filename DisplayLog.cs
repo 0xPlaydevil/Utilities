@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Text;
 
-namespace Spoon.Debug
+namespace Spoon
 {
 	public class DisplayLog : Singleton<DisplayLog> {
 		public int maxLogLength = 8000;		// 在hololens下建议不超过10K，30K以上时高频Log会明显卡顿（近乎空场景下测试）
