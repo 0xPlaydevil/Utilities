@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace HoloToolkit.Unity
+namespace Spoon
 {
     /// <summary>
     /// Extension methods for Unity's GameObject class
