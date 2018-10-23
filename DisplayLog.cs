@@ -20,7 +20,7 @@ namespace Spoon
 		private int fixedCount = 0;
 
 		// Use this for initialization
-		void Awake () {
+		protected override void Awake () {
 			base.Awake();
 		    Application.logMessageReceived += HandleLog;
 		}
