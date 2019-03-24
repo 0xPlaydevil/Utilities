@@ -11,6 +11,8 @@ public class FreeCamMove : MonoBehaviour
 {
 	[Tooltip(" 可以留空 ")]public Texture2D cursorHand;
 	public Vector2 hotspot = Vector2.zero;
+
+	public GameObject centerObj = null;	// 绕物体旋转模式。如果有值，将不能自由移动摄像机
 	[Space]
 	public float m_HRotateSpeed = 10;	// 旋转的速度 水平
 	public float m_VRotateSpeed = 10;	// 旋转的速度 竖直
@@ -74,9 +76,12 @@ public class FreeCamMove : MonoBehaviour
 
 	void LateUpdate()
 	{
-		ApplyMouseDrag();
+		if(!centerObj)
+		{
+			ApplyMouseDrag();
+			ApplyMove();
+		}
 		ApplyRotate();
-		ApplyMove();
 		ApplyStretch();
 	}
 
@@ -213,7 +218,7 @@ public class FreeCamMove : MonoBehaviour
 
 	void ApplyRotate()
 	{
-		m_focusCenter = !Input.GetKey(KeyCode.LeftAlt);
+		m_focusCenter = centerObj || !Input.GetKey(KeyCode.LeftAlt);
 		if(!m_focusCenter)	m_isFocusing = false;
 		// 应用旋转
 		if(Input.GetMouseButton(1))
@@ -226,7 +231,13 @@ public class FreeCamMove : MonoBehaviour
 
 		if(m_focusCenter)
 		{
-			if(Input.GetMouseButtonDown(1)
+			if(centerObj)
+			{
+				m_rotateCenter = centerObj.transform.position;
+				m_camZDist = Vector3.Distance(centerObj.transform.position,m_camTrans.position);
+				m_isFocusing = true;
+			}
+			else if(Input.GetMouseButtonDown(1)
 				&& Physics.Raycast(m_camTrans.position,m_camTrans.forward,out m_camZHit,Mathf.Infinity,m_centerBaseLayer))
 			{
 				m_rotateCenter = m_camZHit.point;
@@ -256,7 +267,7 @@ public class FreeCamMove : MonoBehaviour
 					}
 				}
 			}
-			if(Input.GetMouseButtonUp(1))
+			if(!centerObj && Input.GetMouseButtonUp(1))
 			{
 				m_isFocusing = false;
 			}
