@@ -3,9 +3,22 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using System.IO;
+using UnityEngine.Events;
+
+public enum BuiltinPath:sbyte
+{
+	Absolute=-1,
+	DataPath,
+	PersistentDataPath,
+	StreamingAssetsPath,
+	TemporaryCachePath
+}
 
 public class Config : MonoBehaviour {
+	public BuiltinPath builtinPath = BuiltinPath.PersistentDataPath;
 	public string jsonPath = null;
+	public UnityEvent onConfigInit = null;
+	//public Func<string> jsonPathProvider;
 	private string jsonStr = null;
 	private JSONObject jsonRoot = null;
 	public bool Initialized
@@ -29,6 +42,8 @@ public class Config : MonoBehaviour {
 			return _instance;
 		}
 	}
+
+	static string[] builtinPaths;
 
 	public string ReadJsonFile(string path)
 	{
@@ -97,6 +112,8 @@ public class Config : MonoBehaviour {
 	
 	void Init()
 	{
+		jsonPath = RedirectPath(jsonPath);
+		if (onConfigInit != null) onConfigInit.Invoke();
         LoadConfig();
     }
 
@@ -115,6 +132,15 @@ public class Config : MonoBehaviour {
             return false;
         }
     }
+
+	string RedirectPath(string relative)
+	{
+		if(builtinPaths==null)
+		{
+			builtinPaths= new string[] { Application.dataPath, Application.persistentDataPath, Application.streamingAssetsPath, Application.temporaryCachePath };
+		}
+		return builtinPath < 0 ? relative : Path.Combine(builtinPaths[(int)builtinPath], relative);
+        }
 
     void OnEnable()
 	{
