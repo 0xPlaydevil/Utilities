@@ -97,11 +97,26 @@ public class Config : MonoBehaviour {
 	
 	void Init()
 	{
-		jsonStr = ReadJsonFile(jsonPath);
-		jsonRoot = new JSONObject(jsonStr);
-	}
+        LoadConfig();
+    }
 
-	void OnEnable()
+    public bool LoadConfig()
+    {
+        jsonStr = ReadJsonFile(jsonPath);
+        if (jsonStr == null) return false;
+        try
+        {
+            jsonRoot = new JSONObject(jsonStr);
+            return true;
+        }
+        catch
+        {
+            jsonStr = null;
+            return false;
+        }
+    }
+
+    void OnEnable()
 	{
 		if(_instance==null)
 		{
