@@ -6,6 +6,7 @@
 
 using UnityEngine;
 using System.Collections;
+using Spoon;
 
 public class FreeCamMove : MonoBehaviour
 {
@@ -68,10 +69,34 @@ public class FreeCamMove : MonoBehaviour
 		m_gyroTrans = m_gyroscope.transform;
 		m_camTrans = transform;
 		m_thisCam = m_camTrans.GetComponent<Camera>();
+		// 如果本物体上没有Camera，在子对象中找MainCamera; 如果也没有，找Depth最大的。
 		if(!m_thisCam)
 		{
-			Debug.LogError(" 此脚本需挂在摄像机上！ ");		// 这里应该改进
+			var cams= m_camTrans.GetComponentsInChildren<Camera>();
+			float maxDepth=float.MinValue;
+			int top=0;
+			int i;
+			for(i=0;i<cams.Length;++i)
+			{
+				if(cams[i].CompareTag("MainCamera"))
+				{
+					m_thisCam=cams[i];
+					break;
+				}
+				if(cams[i].depth> maxDepth)
+				{
+					top=i;
+					maxDepth=cams[i].depth;
+				}
+			}
+			m_thisCam=cams[top];
+			print("Camera of FreeCamMove: "+m_thisCam.transform.GetFullPath("/"));
 		}
+		Debug.Assert(m_thisCam, "GameObject层级中未找到Camera", this);
+		// if(!m_thisCam)
+		// {
+		// 	Debug.LogError(" 此脚本需挂在摄像机上！ ");		// 这里应该改进
+		// }
 	}
 
 	void LateUpdate()
