@@ -89,7 +89,7 @@ public class FreeCamMove : MonoBehaviour
 					maxDepth=cams[i].depth;
 				}
 			}
-			m_thisCam=cams[top];
+			if(!m_thisCam)	m_thisCam=cams[top];
 			print("Camera of FreeCamMove: "+m_thisCam.transform.GetFullPath("/"));
 		}
 		Debug.Assert(m_thisCam, "GameObject层级中未找到Camera", this);
