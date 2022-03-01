@@ -2,66 +2,69 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DbManager : MonoBehaviour
+namespace PlayDev
 {
-	public SQLHelper.DbType dbType;
-	public string dbPath;
-	public string user;
-	public string password;
-	public string dbName;
-	public string port;
-
-	public bool isDebug= false;
-
-	SQLHelper _db= null;
-	public SQLHelper db
+	public class DbManager : MonoBehaviour
 	{
-		get
+		public SQLHelper.DbType dbType;
+		public string dbPath;
+		public string user;
+		public string password;
+		public string dbName;
+		public string port;
+
+		public bool isDebug= false;
+
+		SQLHelper _db= null;
+		public SQLHelper db
 		{
-			if(_db==null && enabled)
+			get
 			{
-				ApplyConfig();
-				_db= new SQLHelper(dbType,dbPath,dbName,user,password,port);
+				if(_db==null && enabled)
+				{
+					ApplyConfig();
+					_db= new SQLHelper(dbType,dbPath,dbName,user,password,port);
+				}
+				if(_db!=null)   _db.debug=isDebug;
+				return _db;
 			}
-			if(_db!=null)   _db.debug=isDebug;
-			return _db;
 		}
-	}
 
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+	    // Start is called before the first frame update
+	    void Start()
+	    {
+	        
+	    }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+	    // Update is called once per frame
+	    void Update()
+	    {
+	        
+	    }
 
-    void ApplyConfig()
-    {
-        dbPath= Config.instance.GetString("DbInfo/Server", dbPath);
-        user= Config.instance.GetString("DbInfo/User", user);
-        password= Config.instance.GetString("DbInfo/Password", password);
-        dbName= Config.instance.GetString("DbInfo/DbName", dbName);
-        port= Config.instance.GetString("DbInfo/Port", port);
-    }
+	    void ApplyConfig()
+	    {
+	        dbPath= Config.instance.GetString("DbInfo/Server", dbPath);
+	        user= Config.instance.GetString("DbInfo/User", user);
+	        password= Config.instance.GetString("DbInfo/Password", password);
+	        dbName= Config.instance.GetString("DbInfo/DbName", dbName);
+	        port= Config.instance.GetString("DbInfo/Port", port);
+	    }
 
-    void OnDisable()
-    {
-    	_db.CloseConnection();
-    }
+	    void OnDisable()
+	    {
+	    	_db.CloseConnection();
+	    }
 
-    void OnApplicationQuit()
-    {
-    	_db.CloseConnection();    	
-    }
+	    void OnApplicationQuit()
+	    {
+	    	_db.CloseConnection();    	
+	    }
 
-	public static string SQuote(string orig)
-	{
-		return "'" + orig + "'";
+		public static string SQuote(string orig)
+		{
+			return "'" + orig + "'";
+		}
 	}
 }

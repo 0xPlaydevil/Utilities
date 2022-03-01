@@ -7,108 +7,111 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-public class Original : MonoBehaviour {
+namespace PlayDev
+{
+	public class Original : MonoBehaviour {
 
-	public class TransInfo
-	{
-		public Vector3 position;
-		public Quaternion rotation;
-		public Transform parentTrans;
-
-		public TransInfo(Transform trans)
+		public class TransInfo
 		{
-			position = trans.localPosition;
-			rotation = trans.localRotation;
-			parentTrans = trans.parent;
-		}
+			public Vector3 position;
+			public Quaternion rotation;
+			public Transform parentTrans;
 
-		public TransInfo()
-		{
-			position = Vector3.zero;
-			rotation = Quaternion.identity;
-			parentTrans = null;
-		}
-
-		public void ToTransform(Transform trans, bool restoreTreeRelation = true)
-		{
-			if(trans.parent != parentTrans && restoreTreeRelation)
+			public TransInfo(Transform trans)
 			{
-				trans.parent = parentTrans;
+				position = trans.localPosition;
+				rotation = trans.localRotation;
+				parentTrans = trans.parent;
 			}
-			if(parentTrans == null)
+
+			public TransInfo()
 			{
-				trans.position = position;
-				trans.rotation = rotation;
+				position = Vector3.zero;
+				rotation = Quaternion.identity;
+				parentTrans = null;
 			}
-			else
+
+			public void ToTransform(Transform trans, bool restoreTreeRelation = true)
 			{
-				trans.localPosition = position;
-				trans.localRotation = rotation;
-			}
-		}
-	}
-
-	private Dictionary<int,TransInfo> m_childInfos;
-
-	// Use this for initialization
-	void Start () {
-		InitInfos();
-	}
-	
-	private void InitInfos()
-	{
-		m_childInfos = new Dictionary<int,TransInfo>();
-		RecordTree(transform);
-	}
-
-	private void RecordTree(Transform parent)
-	{
-		for(int i=0;i<parent.childCount;++i)
-		{
-			Transform trans = parent.GetChild(i);
-			m_childInfos.Add(trans.GetInstanceID(),new TransInfo(trans));
-			if(trans.childCount>0)
-			{
-				RecordTree(trans);
+				if(trans.parent != parentTrans && restoreTreeRelation)
+				{
+					trans.parent = parentTrans;
+				}
+				if(parentTrans == null)
+				{
+					trans.position = position;
+					trans.rotation = rotation;
+				}
+				else
+				{
+					trans.localPosition = position;
+					trans.localRotation = rotation;
+				}
 			}
 		}
-	}
-	// 重设当前树的子节点信息，如果在Record后树结构发生过变化，无法恢复原树结构
-	private void ResetTree(Transform nodeTrans)
-	{
-		for(int i=0;i<nodeTrans.childCount;++i)
+
+		private Dictionary<int,TransInfo> m_childInfos;
+
+		// Use this for initialization
+		void Start () {
+			InitInfos();
+		}
+		
+		private void InitInfos()
 		{
-			Transform trans = nodeTrans.GetChild(i);
-			m_childInfos[trans.GetInstanceID()].ToTransform(trans,false);
-			if(trans.childCount>0)
+			m_childInfos = new Dictionary<int,TransInfo>();
+			RecordTree(transform);
+		}
+
+		private void RecordTree(Transform parent)
+		{
+			for(int i=0;i<parent.childCount;++i)
 			{
-				ResetTree(trans);
+				Transform trans = parent.GetChild(i);
+				m_childInfos.Add(trans.GetInstanceID(),new TransInfo(trans));
+				if(trans.childCount>0)
+				{
+					RecordTree(trans);
+				}
 			}
 		}
-	}
-
-	public void ResetBody()
-	{
-		ResetTree(transform);
-	}
-
-	// return null if record NOT found
-	public TransInfo GetOrigTransInfo(Transform trans)
-	{
-		try
+		// 重设当前树的子节点信息，如果在Record后树结构发生过变化，无法恢复原树结构
+		private void ResetTree(Transform nodeTrans)
 		{
-			return m_childInfos[trans.GetInstanceID()];
+			for(int i=0;i<nodeTrans.childCount;++i)
+			{
+				Transform trans = nodeTrans.GetChild(i);
+				m_childInfos[trans.GetInstanceID()].ToTransform(trans,false);
+				if(trans.childCount>0)
+				{
+					ResetTree(trans);
+				}
+			}
 		}
-		catch
+
+		public void ResetBody()
 		{
-			return null;
+			ResetTree(transform);
 		}
-	}
 
-	// Throw KeyNotFoundException if record NOT found
-	public void RestoreTransform(Transform trans)
-	{
-		m_childInfos[trans.GetInstanceID()].ToTransform(trans);
-	}
+		// return null if record NOT found
+		public TransInfo GetOrigTransInfo(Transform trans)
+		{
+			try
+			{
+				return m_childInfos[trans.GetInstanceID()];
+			}
+			catch
+			{
+				return null;
+			}
+		}
 
+		// Throw KeyNotFoundException if record NOT found
+		public void RestoreTransform(Transform trans)
+		{
+			m_childInfos[trans.GetInstanceID()].ToTransform(trans);
+		}
+
+	}
 }

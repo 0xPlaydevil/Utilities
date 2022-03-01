@@ -1,26 +1,30 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using PlayDev;
 
-public class ConfigExample : MonoBehaviour {
-	// Use this for initialization
-	void Awake () {
-		// 配置视频地址
-		JSONObject videoAddr = Config.instance.GetJsonObj("VideoAddr");
-		if(videoAddr!= null)
-		{
-			string text = videoAddr.str;
-			print(text);
+namespace PlayDevExample
+{
+	public class ConfigExample : MonoBehaviour {
+		// Use this for initialization
+		void Awake () {
+			// 配置视频地址
+			JSONObject videoAddr = Config.instance.GetJsonObj("VideoAddr");
+			if(videoAddr!= null)
+			{
+				string text = videoAddr.str;
+				print(text);
+			}
 		}
-	}
 
-	void Start()
-	{
-		JSONObject robotShow = Config.instance.GetJsonObj("RobotShow");
-		if(robotShow!=null && robotShow.b)
+		void Start()
 		{
-			print("RobotShow exist.");
+			JSONObject robotShow = Config.instance.GetJsonObj("RobotShow");
+			if(robotShow!=null && robotShow.b)
+			{
+				print("RobotShow exist.");
+			}
 		}
-	}
 
+	}
 }
